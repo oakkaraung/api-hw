@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        button {
+            background-color: aqua
+        }
+        body {
+            background-color: pink
+        }
+    </style>
+
+<body>
+    <div id="btnSpace"></div>
+
+    <form id="gif-form">
+        <label for="gif-input">What GIF button do you want?</label>
+        <input type="text" id="gif-input">
+        <br>
+  
+        <!-- Button triggers new movie to be added -->
+        <input id="add-gif" type="submit" value="AddGif">
+      </form>
+
+    <div id="gifSpace0"><img id="gif0" class="gif"></div>
+    <div id="gifSpace1"><img id="gif1" class="gif"></div>
+    <div id="gifSpace2"><img id="gif2" class="gif"></div>
+    <div id="gifSpace3"><img id="gif3" class="gif"></div>
+    <div id="gifSpace4"><img id="gif4" class="gif"></div>
+    <div id="gifSpace5"><img id="gif5" class="gif"></div>
+    <div id="gifSpace6"><img id="gif6" class="gif"></div>
+    <div id="gifSpace7"><img id="gif7" class="gif"></div>
+    <div id="gifSpace8"><img id="gif8" class="gif"></div>
+    <div id="gifSpace9"><img id="gif9" class="gif"></div>
+
+    
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script>
+        var topics = ["Travis Scott", "Offset", "Tyler the Creator", "ASAP Rocky"];
+        makeBtns();
+
+        var still = true;
+
+        var firstClick = true;
+
+
+
+        function makeBtns() {
+            var btnDiv = $("<div>");
+            for (var i = 0; i < topics.length; i++) {
+                btnDiv.append($("<button>").addClass("clickBoi").text(topics[i]));
+            }
+            $("#btnSpace").html(btnDiv);
+        };
+
+        $(".gif").on("click", function () {
+            console.log("logged");
+            var state = $(this).attr("data-state");
+            if (state === "still") {
+                $(this).attr("src", $(this).attr("data-animate"));
+                $(this).attr("data-state", "animate");
+            } else {
+                $(this).attr("src", $(this).attr("data-still"));
+                $(this).attr("data-state", "still");
+            }
+        });
+
+        $("#btnSpace").on("click", ".clickBoi" ,function () {
+            console.log("log")
+            var topic = $(this).text();
+            var APIurl = "https://api.giphy.com/v1/gifs/search?api_key=EKJ8VlvHdvztHDqFpGcg8qMs4O4zjFqZ&q=" + topic + "&limit=25&offset=0&rating=G&lang=en";
+            $.ajax({
+                url: APIurl,
+                method: "GET"
+            }).then(function (response) {
+                if (!firstClick) {
+                    for (var i = 0; i < 10; i++) {
+                        $("#annoying").remove()
+                    }
+                }
+                for (var i = 0; i < 10; i++) {
+                    $("#gifSpace" + i).append("<p id='annoying'>Rating: " + response.data[i].rating + "<br><p>");
+                    $("#gif" + i).attr("src", response.data[i].images.fixed_height_still.url);
+                    $("#gif" + i).attr("data-animate", response.data[i].images.fixed_height.url);
+                    $("#gif" + i).attr("data-still", response.data[i].images.fixed_height_still.url);
+                    $("#gif" + i).attr("data-state", "still")
+                }
+                firstClick = false;
+            });
+        });
+
+        $("#add-gif").on("click", function(event) {
+            event.preventDefault();
+            var input = $("#gif-input").val().trim();
+            topics.push(input);
+            makeBtns();
+            console.log(topics);
+        });
+    </script>
+</body>
+
+</html>
